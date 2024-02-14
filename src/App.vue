@@ -10,40 +10,55 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
+
 export default {
-  data() {
-    return {
-      expression: '',
-      buttons: ['1', '2', '3', '+', '4', '5', '6', '-', '7', '8', '9', '*', '0', '.', '/']
+  setup() {
+    const expression = ref('');
+    const buttons = ['1', '2', '3', '+', '4', '5', '6', '-', '7', '8', '9', '*', '0', '.', '/'];
+
+    const appendToExpression = (char) => {
+      expression.value += char;
     };
-  },
-  methods: {
-    appendToExpression(char) {
-      this.expression += char;
-    },
-    clear() {
-      this.expression = '';
-    },
-    calculate() {
+
+    const clear = () => {
+      expression.value = '';
+    };
+
+    const calculate = () => {
       try {
-        this.expression = eval(this.expression).toString();
+        expression.value = eval(expression.value).toString();
       } catch (error) {
         alert('Invalid expression');
-        this.expression = '';
+        expression.value = '';
       }
-    },
-    handleKeyDown(event) {
+    };
+
+    const handleKeyDown = (event) => {
       const key = event.key;
-      if (this.buttons.includes(key)) {
-        this.appendToExpression(key);
+      if (buttons.includes(key)) {
+        appendToExpression(key);
       } else if (key === 'Enter') {
-        this.calculate();
+        calculate();
       } else if (key === 'Backspace') {
-        this.expression = this.expression.slice(0, -1);
+        expression.value = expression.value.slice(0, -1);
       } else if (key === 'Escape') {
-        this.clear();
+        clear();
       }
-    }
+    };
+
+    onMounted(() => {
+      window.addEventListener('keydown', handleKeyDown);
+    });
+
+    return {
+      expression,
+      buttons,
+      appendToExpression,
+      clear,
+      calculate,
+      handleKeyDown
+    };
   }
 };
 </script>
